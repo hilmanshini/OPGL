@@ -1,23 +1,29 @@
 package co.astrnt.medrec.medrec.framework.opengl.programs;
 
-import android.opengl.GLES20;
+import android.content.res.Resources;
+
+import co.astrnt.medrec.medrec.R;
 
 /**
  * Created by hill on 6/28/17.
  */
 
-public class RectangleProgram extends OpenGlProgram {
-    int programPointer;
+public class RectangleProgram extends ScriptedProgram {
 
-    public RectangleProgram() {
-        programPointer = GLES20.glCreateProgram();
-        if(programPointer == 0){
+    public RectangleProgram(Resources mResources) {
+        super(mResources);
+        if(getLinkStatus() == LINK_SUCCESS){
 
         }
     }
 
     @Override
-    public int getProgramPointer() {
-        return 0;
+    public int getVertexShaderResourceInt() {
+        return R.raw.simple_v;
+    }
+
+    @Override
+    public int getFragmentShaderResourceInt() {
+        return R.raw.simple_f;
     }
 }
