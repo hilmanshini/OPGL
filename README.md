@@ -1,2 +1,2 @@
 # OPGL
-Framework to simplify the opengl
+Framework to simplify the opengl android
