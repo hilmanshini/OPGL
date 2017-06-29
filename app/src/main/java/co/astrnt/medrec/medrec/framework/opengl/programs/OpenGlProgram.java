@@ -8,7 +8,7 @@ import android.util.Log;
  */
 
 abstract class OpenGlProgram {
-    private int programPointer;
+    private int programPointer = -1;
     public static final int STATE_FAILED_TO_CREATE_PROGRAM = 0;
     public static final int STATE_PROGRAM_OK = 1;
     private int programState;
@@ -38,9 +38,17 @@ abstract class OpenGlProgram {
         if (programState == STATE_PROGRAM_OK) {
             Log.e(TAG, "Program compile state OK with id " + programPointer);
         } else {
-            Log.e(TAG,"Program compile FAILED");
+            Log.e(TAG, "Program compile FAILED");
         }
-
         return super.toString();
+    }
+
+    public void release() {
+        if (programPointer > 0) {
+            GLES20.glDeleteProgram(getProgramPointer());
+        }
+    }
+    public void use(){
+        GLES20.glUseProgram(programPointer);
     }
 }

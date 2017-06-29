@@ -44,8 +44,8 @@ abstract class ScriptedProgram extends OpenGlProgram {
     }
 
     private int linkStatus = -1;
-    private int vertexShaderPointer;
-    private int fragmentShaderPointer;
+    private int vertexShaderPointer = -1;
+    private int fragmentShaderPointer = -1;
     private int shaderCompileState = 0;
 
     private int compile() {
@@ -117,5 +117,17 @@ abstract class ScriptedProgram extends OpenGlProgram {
     }
     public int getLinkStatus() {
         return linkStatus;
+    }
+    public void release(){
+        GLES20.glUseProgram(0);
+
+        if(vertexShaderPointer > 0){
+            GLES20.glDeleteShader(vertexShaderPointer);
+        }
+
+        if(fragmentShaderPointer > 0){
+            GLES20.glDeleteShader(fragmentShaderPointer);
+        }
+        super.release();
     }
 }

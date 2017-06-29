@@ -3,11 +3,15 @@
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-public class MainActivity extends AppCompatActivity {
+import co.astrnt.medrec.medrec.framework.widget.camera.CameraGLSurfaceView;
+import co.astrnt.medrec.medrec.framework.widget.camera.TestGLSurface;
+
+ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        TestGLSurface mCameraGLSurfaceView = new TestGLSurface(this);
+        setContentView(mCameraGLSurfaceView);
     }
 }
