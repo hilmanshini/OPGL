@@ -51,4 +51,5 @@ abstract class OpenGlProgram {
     public void use(){
         GLES20.glUseProgram(programPointer);
     }
+
 }

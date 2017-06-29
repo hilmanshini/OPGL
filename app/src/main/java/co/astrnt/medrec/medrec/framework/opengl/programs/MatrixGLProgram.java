@@ -16,6 +16,7 @@ public class MatrixGLProgram extends BufferedProgram implements GLDrawable {
     public float[] mProjectionMatrix = new float[16];
     public float[] mViewMatrix = new float[16];
     public float[] mMVPMatrix = new float[16];
+    private final float[] mRotationMatrix = new float[16];
     private int screenWidth;
     private int screenHeight;
     private float wFactor;
@@ -34,7 +35,8 @@ public class MatrixGLProgram extends BufferedProgram implements GLDrawable {
         wFactor = 1f / screenWidth;
         hFactor = 1f / screenHeight;
         float ratio = (float) width / height;
-        Matrix.frustumM(mProjectionMatrix, 0, -ratio, ratio, -1, 1, 3, 7);
+
+//        Matrix.frustumM(mProjectionMatrix, 0, -ratio, ratio, -1, 1, 3, 7);
     }
 
     public void draw() {
@@ -62,13 +64,13 @@ public class MatrixGLProgram extends BufferedProgram implements GLDrawable {
 
     @Override
     public void draw(int size) {
-        Matrix.setLookAtM(mViewMatrix, 0, 0, 0, -3, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
+//        Matrix.setLookAtM(mViewMatrix, 0, 0, 0, -3, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP,0,size);
     }
 
     @Override
     public void draw(String bufferName, int size) {
-        Matrix.setLookAtM(mViewMatrix, 0, 0, 0, -3, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
+//        Matrix.setLookAtM(mViewMatrix, 0, 0, 0, -3, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
 
         Buffer buffer = bufferMap.get(bufferName);;
         if(buffer instanceof ShortBuffer){
@@ -83,11 +85,14 @@ public class MatrixGLProgram extends BufferedProgram implements GLDrawable {
 
     }
 
-    int xpos = 0;
+    int xpos = 100;
     int ypos = 0;
 
     public void fillMatrix(String var) {
         GLES20.glUniformMatrix4fv(GLES20.glGetUniformLocation(getProgramPointer(), var), 1, false, mMVPMatrix, 0);
+    }
+    public void fillMatrix(String var,float[] data) {
+        GLES20.glUniformMatrix4fv(GLES20.glGetUniformLocation(getProgramPointer(), var), 1, false, data, 0);
     }
     public void flushTransform() {
         Log.e("MATR", "MULTIPLY");
@@ -111,10 +116,10 @@ public class MatrixGLProgram extends BufferedProgram implements GLDrawable {
         this.ypos = ypos;
     }
 
-    public void fillMatrixIdentity(String var) {
-        float[] q = new float[16];
-        Matrix.setIdentityM(q, 0);
-        GLES20.glUniformMatrix4fv(GLES20.glGetUniformLocation(getProgramPointer(), var), 1, false, q, 0);
-
+    public float[] getRotationMatrix(int mAngle){
+        float[] scratch = new float[16];
+        Matrix.setRotateM(mRotationMatrix, 0, mAngle, 0, 0, 1.0f);
+        Matrix.multiplyMM(scratch, 0, mMVPMatrix, 0, mRotationMatrix, 0);
+        return scratch;
     }
 }

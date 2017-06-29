@@ -3,6 +3,7 @@ package co.astrnt.medrec.medrec.framework.widget.camera;
 import android.content.Context;
 import android.graphics.SurfaceTexture;
 import android.opengl.GLSurfaceView;
+import android.opengl.Matrix;
 import android.util.AttributeSet;
 import android.util.Log;
 
@@ -59,32 +60,32 @@ public class TestGLSurface extends GLSurfaceView implements GLSurfaceView.Render
             mVideoDecoder.createDecoder();
             mVideoDecoder.start();
         }
+        mTextureGLProgram.viewport(width,height);
     }
 
     @Override
     public void onDrawFrame(GL10 gl) {
-        mGlScene.clear();
         boolean needDraw = mVideoDecoder.drawIfAny();
-        if(needDraw){
+        if (needDraw) {
             mTextureGLProgram.use();
-            mTextureGLProgram.enableVertexBuffer("vertex","vPosition",2);
-            mTextureGLProgram.enableVertexBuffer("fragment","vTexCoord",2);
+            mTextureGLProgram.enableVertexBuffer("vertex", "vPosition", 2);
+            mTextureGLProgram.enableVertexBuffer("fragment", "vTexCoord", 2);
             mTextureGLProgram.activeTexture();
-            mTextureGLProgram.flushTransform();
-            mTextureGLProgram.fillMatrixIdentity("uMVP");
-            mTextureGLProgram.setTexture("sTexture",0);
-            mTextureGLProgram.draw("order",6);
+
+
+
+
+
+            mTextureGLProgram.fillMatrix("uMVP",mTextureGLProgram.getRotationMatrix(90));
+
+
+
+            mTextureGLProgram.draw("order", 6);
         }
-
-
-
-
-
-
     }
 
     @Override
     public void onFrameAvailable(SurfaceTexture surfaceTexture) {
-        Log.e("HILGL_FRAME","AVAIL");
+        Log.e("HILGL_FRAME", "AVAIL");
     }
 }

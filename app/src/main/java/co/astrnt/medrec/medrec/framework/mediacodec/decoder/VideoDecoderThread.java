@@ -16,6 +16,8 @@ public class VideoDecoderThread extends Thread {
         this.mVideoDecoder = mVideoDecoder;
     }
 
+    long currentSampleTime;
+
     public boolean readSampleData() {
         int inputBufferIndex = mVideoDecoder.decoder.dequeueInputBuffer(10000);
 
@@ -25,6 +27,7 @@ public class VideoDecoderThread extends Thread {
             ByteBuffer activeBuffer = allInputBuffers[inputBufferIndex];
             int sampleSize = mVideoDecoder.mediaExtractor.readSampleData(activeBuffer, 0);
             Log.e("STARTOVER_VCAL", "SAMPLES " + mVideoDecoder.mediaExtractor.getSampleTime() + " " + sampleSize);
+            currentSampleTime = mVideoDecoder.mediaExtractor.getSampleTime();
             if (sampleSize > 0) {
 
                 mVideoDecoder.decoder.queueInputBuffer(inputBufferIndex, 0, sampleSize, mVideoDecoder.mediaExtractor.getSampleTime(), 0);
@@ -56,8 +59,12 @@ public class VideoDecoderThread extends Thread {
     public void run() {
         super.run();
         while (!eos) {
+
             eos = readSampleData();
             writeSampleData();
         }
+
     }
+
+
 }
