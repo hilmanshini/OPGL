@@ -1,4 +1,4 @@
-package co.astrnt.medrec.medrec.framework.opengl.programs;
+package co.astrnt.medrec.medrec.framework.opengl.v1;
 
 import android.content.res.Resources;
 import android.graphics.SurfaceTexture;
@@ -12,10 +12,15 @@ import co.astrnt.medrec.medrec.R;
  */
 
 public class TextureGLProgram extends MatrixGLProgram {
-    private int mTextureID;
+    private int mTextureID = -1;
 
     public TextureGLProgram(Resources mResources) {
         super(mResources);
+    }
+
+    public TextureGLProgram(Resources mResources, int mTextureID) {
+        super(mResources);
+        this.mTextureID = mTextureID;
     }
 
     @Override
@@ -27,11 +32,14 @@ public class TextureGLProgram extends MatrixGLProgram {
     public int getFragmentShaderResourceInt() {
         return R.raw.test_texture_f;
     }
-    public SurfaceTexture createSurfaceTexture(int w, int h) {
-        int[] textures = new int[1];
-        GLES20.glGenTextures(1, textures, 0);
 
-        mTextureID = textures[0];
+    public SurfaceTexture createSurfaceTexture(int w, int h) {
+        if(mTextureID == -1){
+            int[] textures = new int[1];
+            GLES20.glGenTextures(1, textures, 0);
+            mTextureID = textures[0];
+        }
+
         GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, mTextureID);
 
         GLES20.glTexParameterf(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
@@ -46,10 +54,15 @@ public class TextureGLProgram extends MatrixGLProgram {
 
     public void activeTexture() {
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+        GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, 0);
         GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, mTextureID);
     }
 
-    public void setTexture(String name,float value) {
+    public void setTexture(String name, float value) {
         GLES20.glUniform1f(GLES20.glGetUniformLocation(getProgramPointer(), name), value);
+    }
+
+    public int getmTextureID() {
+        return mTextureID;
     }
 }

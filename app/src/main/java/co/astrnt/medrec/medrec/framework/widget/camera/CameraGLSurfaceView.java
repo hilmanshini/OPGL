@@ -3,18 +3,15 @@ package co.astrnt.medrec.medrec.framework.widget.camera;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
-import android.util.Log;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-import co.astrnt.medrec.medrec.framework.opengl.programs.BitmapProgram;
-import co.astrnt.medrec.medrec.framework.opengl.programs.GLScene;
-import co.astrnt.medrec.medrec.framework.opengl.programs.RectangleProgram;
-import co.astrnt.medrec.medrec.framework.opengl.programs.Utils;
+import co.astrnt.medrec.medrec.framework.opengl.v1.BitmapProgram;
+import co.astrnt.medrec.medrec.framework.opengl.v1.GLScene;
+import co.astrnt.medrec.medrec.framework.opengl.v1.RectangleProgram;
 
 /**
  * Created by hill on 6/28/17.

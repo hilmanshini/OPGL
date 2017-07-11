@@ -1,8 +1,7 @@
-package co.astrnt.medrec.medrec.framework.opengl.programs;
+package co.astrnt.medrec.medrec.framework.opengl.v1;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
 import android.util.Log;
 

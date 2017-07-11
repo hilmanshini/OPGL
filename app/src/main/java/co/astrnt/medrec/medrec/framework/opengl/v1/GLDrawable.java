@@ -1,4 +1,4 @@
-package co.astrnt.medrec.medrec.framework.opengl.programs;
+package co.astrnt.medrec.medrec.framework.opengl.v1;
 
 /**
  * Created by hill on 6/28/17.

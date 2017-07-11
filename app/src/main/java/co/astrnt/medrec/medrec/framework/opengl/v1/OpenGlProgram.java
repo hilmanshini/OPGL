@@ -1,4 +1,4 @@
-package co.astrnt.medrec.medrec.framework.opengl.programs;
+package co.astrnt.medrec.medrec.framework.opengl.v1;
 
 import android.opengl.GLES20;
 import android.util.Log;
