@@ -62,7 +62,7 @@ public class TestVideo extends Activity {
             }
             mDrawerDisplay = new Drawer(getResources());
             try {
-                mMediaVideoRecordHandler = MediaVideoRecordHandler.start(getResources(), mDrawerDisplay, EGL14.eglGetCurrentContext(), new Listener() {
+                mMediaVideoRecordHandler = CompressedMediaVideoRecordHandler.start(getResources(), mDrawerDisplay, EGL14.eglGetCurrentContext(), new Listener() {
                     @Override
                     public void onFinish() {
 

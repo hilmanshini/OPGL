@@ -49,8 +49,7 @@ public class MediaVideoRecordHandler extends Handler {
     }
 
     long startTime = -1;
-    int currentTime = 0;
-    int currentTimeCoumt = 0;
+
 
     @Override
     public void handleMessage(Message msg) {
@@ -63,26 +62,17 @@ public class MediaVideoRecordHandler extends Handler {
                 } else {
                     time = System.nanoTime() - startTime;
                 }
-                long secTime = TimeUnit.NANOSECONDS.toSeconds(time);
-                if (secTime == currentTime) {
+                if(isValidTiming(time,startTime)){
+                    float[] xy = (float[]) msg.obj;
+                    mMediaVideoRecord.drain(false);
+                    mDrawer.clear();
+                    mDrawer.draw((float) xy[0], (float) xy[1]);
 
-                    currentTimeCoumt++;
-                    if (currentTimeCoumt > 5) {
-                        currentTime++;
-                        currentTimeCoumt = 0;
-                    }
 
-                    Log.e("FRAMEBLIT", " " + currentTime+" "+currentTimeCoumt);
-
+                    mMediaVideoRecord.swapDisplay(time);
+                    frame++;
                 }
-                float[] xy = (float[]) msg.obj;
-                mMediaVideoRecord.drain(false);
-                mDrawer.clear();
-                mDrawer.draw((float) xy[0], (float) xy[1]);
 
-
-                mMediaVideoRecord.swapDisplay(time);
-                frame++;
 
 
             } else if (msg.what == VideoCodec.TERMINATE) {
@@ -100,6 +90,10 @@ public class MediaVideoRecordHandler extends Handler {
                 mDrawer.onSurfaceChanged(xy[0], xy[1]);
             }
         }
+    }
+
+    protected boolean isValidTiming(long time, long startTime) {
+        return true;
     }
 
     public void sendMessage(int msg, Object object) {
