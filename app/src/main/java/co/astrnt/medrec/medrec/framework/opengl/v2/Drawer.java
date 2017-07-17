@@ -8,13 +8,14 @@ import android.util.Log;
 import java.nio.ShortBuffer;
 
 import co.astrnt.medrec.medrec.R;
+import co.astrnt.medrec.medrec.framework.opengl.IDrawer;
 import imageogl.view.opengl_x.GLProgram;
 import imageogl.view.opengl_x.GLUtils;
 import co.astrnt.medrec.medrec.framework.opengl.v2.objects.BitmapGlObject;
 import co.astrnt.medrec.medrec.framework.opengl.v2.objects.CameraGlObject;
 import co.astrnt.medrec.medrec.framework.opengl.v2.objects.SimpleGlObject;
 
-public class Drawer {
+public class Drawer implements IDrawer{
     private BitmapGlObject bitmapGlObject;
     private GLProgram bitmapProgram;
     private CameraGlObject cameraGlObject;
@@ -74,19 +75,10 @@ public class Drawer {
         this.cameraGlObject.onSurfaceChanged(width, height);
     }
 
-    private void log(float[] data) {
-        Log.e("VERTEX> ", " >>>>>>>>>>>>>>>>>>>>>>>>>> ");
-        for (int i = 0; i < data.length; i += 4) {
-
-            Log.e("VERTEX> ", " " + data[i] + " " + data[i + 1] + " " + data[i + 2] + " " + data[i + 3]);
-
-        }
-        Log.e("VERTEX> ", " >>>>>>>>>>>>>>>>>>>>>>>>>> ");
-    }
-
-    float d = -1;
-
-    public void draw(float xDelta, float yDelta) {
+    @Override
+    public void draw(Object... params) {
+        float xDelta = (float) params[0];
+        float yDelta = (float) params[1];
         this.glProgram.clear();
         this.glProgram.clear(1.0f, 1.0f, 1.0f);
         this.glProgram.onDrawFrame(xDelta, yDelta,1,1,1);
@@ -126,9 +118,28 @@ public class Drawer {
         d+= 0.02f;
     }
 
+    private void log(float[] data) {
+        Log.e("VERTEX> ", " >>>>>>>>>>>>>>>>>>>>>>>>>> ");
+        for (int i = 0; i < data.length; i += 4) {
+
+            Log.e("VERTEX> ", " " + data[i] + " " + data[i + 1] + " " + data[i + 2] + " " + data[i + 3]);
+
+        }
+        Log.e("VERTEX> ", " >>>>>>>>>>>>>>>>>>>>>>>>>> ");
+    }
+
+    float d = -1;
+
+
+
 
     public void clear() {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
         GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    }
+
+    @Override
+    public void onSurfaceCreated() {
+
     }
 }

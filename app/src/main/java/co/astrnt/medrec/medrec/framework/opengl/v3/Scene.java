@@ -30,11 +30,20 @@ import static android.opengl.GLES20.glShaderSource;
 
 public class Scene {
     public float getWidthFactor(int x) {
-        return 0;
+        return (float) x / (float) width;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
     }
 
     public float getHeightFactor(int y) {
-        return 0;
+        return (float) y / (float) height;
+
     }
 
     private static final int FAILED_TO_CREATE_SHADER = -1000;
@@ -61,15 +70,19 @@ public class Scene {
     int width;
     int height;
 
-    public void updateViewPort(int width, int height) {
+    public void updateViewPort(int width, int height,int orientation) {
         this.width = width;
         this.height = height;
+        for (Object2D object2D : object2DList) {
+            object2D.onUpdateViewPort(this,width,height,orientation);
+        }
         GLES20.glViewport(0, 0, width, height);
     }
 
+
     public void clear() {
         GLES20.glClear(GL_COLOR_BUFFER_BIT);
-        GLES20.glClearColor(r/255,g/255,b/255,a/255);
+        GLES20.glClearColor(r / 255, g / 255, b / 255, a / 255);
     }
 
     List<Object2D> object2DList = new ArrayList<>();

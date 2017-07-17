@@ -10,6 +10,7 @@ import android.util.Log;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import co.astrnt.medrec.medrec.framework.opengl.IDrawer;
 import co.astrnt.medrec.medrec.framework.opengl.v2.Drawer;
 
 /**
@@ -18,8 +19,8 @@ import co.astrnt.medrec.medrec.framework.opengl.v2.Drawer;
 
 public class CompressedMediaVideoRecordHandler extends MediaVideoRecordHandler {
 
-    public CompressedMediaVideoRecordHandler(Looper looper, MediaVideoRecord mMediaVideoRecord, Drawer mDrawer, Resources mResources) {
-        super(looper, mMediaVideoRecord, mDrawer, mResources);
+    public CompressedMediaVideoRecordHandler(Looper looper, MediaVideoRecord mMediaVideoRecord, IDrawer mDrawer, Resources mResources, Listener mListener) {
+        super(looper, mMediaVideoRecord, mDrawer, mResources, mListener);
     }
 
 
@@ -27,7 +28,7 @@ public class CompressedMediaVideoRecordHandler extends MediaVideoRecordHandler {
         HandlerThread handlerThread = new HandlerThread("VCodec");
         handlerThread.start();
         MediaVideoRecord mMediaVideoRecord = new MediaVideoRecord(mResources, mListener, width, height, mediaMuxer);
-        CompressedMediaVideoRecordHandler self = new CompressedMediaVideoRecordHandler(handlerThread.getLooper(), mMediaVideoRecord, mDrawer, mResources);
+        CompressedMediaVideoRecordHandler self = new CompressedMediaVideoRecordHandler(handlerThread.getLooper(), mMediaVideoRecord, mDrawer, mResources,mListener);
         return self;
     }
 
@@ -35,7 +36,7 @@ public class CompressedMediaVideoRecordHandler extends MediaVideoRecordHandler {
         HandlerThread handlerThread = new HandlerThread("VCodec");
         handlerThread.start();
         MediaVideoRecord mMediaVideoRecord = new MediaVideoRecord(mResources, eglContext, mListener, width, height, mediaMuxer);
-        CompressedMediaVideoRecordHandler self = new CompressedMediaVideoRecordHandler(handlerThread.getLooper(), mMediaVideoRecord, mDrawer, mResources);
+        CompressedMediaVideoRecordHandler self = new CompressedMediaVideoRecordHandler(handlerThread.getLooper(), mMediaVideoRecord, mDrawer, mResources,mListener);
         return self;
     }
 

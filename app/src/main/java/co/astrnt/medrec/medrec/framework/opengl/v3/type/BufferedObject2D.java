@@ -64,6 +64,8 @@ public abstract class BufferedObject2D extends Object2D {
         bufferMap.put(name, mBuffer);
     }
 
+    protected int originalTextureW, originalTextureH;
+
     public int loadTexture(int resourceId) {
         log("loading texture for " + resourceId);
         int[] textureHandle = new int[1];
@@ -73,6 +75,8 @@ public abstract class BufferedObject2D extends Object2D {
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inScaled = false;
             Bitmap bitmap = BitmapFactory.decodeResource(mResources, resourceId, options);
+            originalTextureW = bitmap.getWidth();
+            originalTextureH = bitmap.getHeight();
             GLES20.glBindTexture(3553, textureHandle[0]);
             GLES20.glTexParameteri(3553, 10241, 9728);
             GLES20.glTexParameteri(3553, 10240, 9728);
@@ -122,7 +126,8 @@ public abstract class BufferedObject2D extends Object2D {
         GLES20.glVertexAttribPointer(posLoc, 2, 5126, false, 0, verticFB2);
         GLES20.glEnableVertexAttribArray(posLoc);
     }
-    public Buffer getBuffer(String name){
+
+    public Buffer getBuffer(String name) {
         return bufferMap.get(name);
     }
 

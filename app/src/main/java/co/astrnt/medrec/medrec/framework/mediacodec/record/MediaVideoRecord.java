@@ -10,7 +10,7 @@ import android.view.Surface;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-
+import co.astrnt.medrec.medrec.framework.mediacodec.record.MediaVideoRecordHandler.Listener;
 import co.astrnt.medrec.medrec.framework.mediacodec.MediaFormatFactory;
 import co.astrnt.medrec.medrec.framework.opengl.v2.CodecInputSurface;
 
@@ -134,6 +134,7 @@ public class MediaVideoRecord {
             codecInputSurface.swapBuffers();
         }
     }
+
 
     public void swapDisplay(int frame) {
         long time = (((long) frame) * 1000000000) / 60;

@@ -1,11 +1,15 @@
 package co.astrnt.medrec.medrec.framework.mediacodec.record;
 
+import android.media.MediaCodec;
+import android.media.MediaFormat;
 import android.media.MediaMuxer;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
+
+import co.astrnt.medrec.medrec.framework.opengl.IDrawer;
 
 /**
  * Created by hill on 7/11/17.
@@ -65,5 +69,25 @@ public class MediaAudioRecordHandler extends Handler {
         mHandlerThread.start();
         MediaAudioRecordHandler maMediaAudioRecordHandler = new MediaAudioRecordHandler(mHandlerThread.getLooper(), mListener,mediaMuxer);
         return maMediaAudioRecordHandler;
+    }
+
+
+    /**
+     * Created by hill on 7/10/17.
+     */
+
+    public interface Listener {
+        void onFinish();
+
+        void onGetFormatToMuxer(MediaFormat newFormat, int mTrackIndex);
+
+        void onPrepared(MediaCodec mMediaCodec);
+
+        void onWriteDataToMuxer(int mTrackIndex, boolean eos, MediaCodec.BufferInfo mBufferInfo);
+
+        IDrawer getDrawerMediaCodecInit();
+
+        IDrawer getDrawerMediaCodecInitCamera(Object obj);
+
     }
 }

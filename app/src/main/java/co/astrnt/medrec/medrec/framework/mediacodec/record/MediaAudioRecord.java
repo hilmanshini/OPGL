@@ -12,6 +12,8 @@ import android.util.Log;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import co.astrnt.medrec.medrec.framework.mediacodec.record.MediaAudioRecordHandler.Listener;
+
 /**
  * Created by hill on 7/11/17.
  */
@@ -86,7 +88,7 @@ public class MediaAudioRecord {
     int trackIndex;
 
     public void encode(long time, boolean eos) {
-        Log.e(">>>>>>>>>>>>.DEQFLAG"," "+time+" "+eos);
+        Log.e(">>>>>>>>>>>>.DEQFLAG", " " + time + " " + eos);
         ByteBuffer[] buffers = mMediaCodec.getInputBuffers();
         ByteBuffer[] outBuffers = mMediaCodec.getOutputBuffers();
         int index = mMediaCodec.dequeueInputBuffer(TIMEOUT_US);
@@ -101,7 +103,7 @@ public class MediaAudioRecord {
             int readBytes = audioRecord.read(bufferRecord, SAMPLES_PER_FRAME);
 
             // set audio data to encoder
-            Log.e("AUDIORX","READ = "+readBytes);
+            Log.e("AUDIORX", "READ = " + readBytes);
             bufferRecord.position(readBytes);
             bufferRecord.flip();
             usedBuffer.put(bufferRecord);
@@ -117,7 +119,7 @@ public class MediaAudioRecord {
             status = mMediaCodec.dequeueOutputBuffer(mBufferInfo, TIMEOUT_US);
             Log.e("DEQOUTPUT", " " + index);
             if (status == MediaCodec.INFO_TRY_AGAIN_LATER) {
-                if(!eos){
+                if (!eos) {
                     break;
                 }
             } else if (status == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
@@ -134,13 +136,13 @@ public class MediaAudioRecord {
                     encodedBuffer.position(mBufferInfo.offset);
 
                     encodedBuffer.limit(mBufferInfo.offset + mBufferInfo.size);
-                    Log.e("DEQWRITE", "WRITING " + mBufferInfo.size + " " + mBufferInfo.presentationTimeUs + " " + eos+" "+mBufferInfo.flags);
+                    Log.e("DEQWRITE", "WRITING " + mBufferInfo.size + " " + mBufferInfo.presentationTimeUs + " " + eos + " " + mBufferInfo.flags);
                     mediaMuxer.writeSampleData(trackIndex, encodedBuffer, mBufferInfo);
-                    mListener.onWriteDataToMuxer(trackIndex,eos, mBufferInfo);
+                    mListener.onWriteDataToMuxer(trackIndex, eos, mBufferInfo);
                 }
                 mMediaCodec.releaseOutputBuffer(status, false);
             }
-            if(eos){
+            if (eos) {
                 break;
             }
         }

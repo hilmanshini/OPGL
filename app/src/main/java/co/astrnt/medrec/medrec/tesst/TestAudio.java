@@ -1,4 +1,4 @@
-package co.astrnt.medrec.medrec.framework.mediacodec.record;
+package co.astrnt.medrec.medrec.tesst;
 
 import android.app.Activity;
 import android.media.MediaCodec;
@@ -8,6 +8,9 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 import java.io.IOException;
+
+import co.astrnt.medrec.medrec.framework.mediacodec.record.MediaAudioRecordHandler;
+import co.astrnt.medrec.medrec.framework.opengl.IDrawer;
 
 /**
  * Created by hill on 7/11/17.
@@ -19,7 +22,7 @@ public class TestAudio extends Activity {
         super.onCreate(savedInstanceState);
         try {
             final MediaMuxer mediaMuxer = new MediaMuxer("/sdcard/ee333.mp4", MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
-            MediaAudioRecordHandler mediaAudioRecordHandler = MediaAudioRecordHandler.start(new Listener() {
+            MediaAudioRecordHandler mediaAudioRecordHandler = MediaAudioRecordHandler.start(new MediaAudioRecordHandler.Listener() {
                 @Override
                 public void onFinish() {
 
@@ -41,6 +44,16 @@ public class TestAudio extends Activity {
                         mediaMuxer.stop();
                         mediaMuxer.release();
                     }
+                }
+
+                @Override
+                public IDrawer getDrawerMediaCodecInit() {
+                    return null;
+                }
+
+                @Override
+                public IDrawer getDrawerMediaCodecInitCamera(Object obj) {
+                    return null;
                 }
             }, mediaMuxer);
             long i = 500l;

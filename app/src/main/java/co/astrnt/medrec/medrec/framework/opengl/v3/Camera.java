@@ -1,10 +1,12 @@
 package co.astrnt.medrec.medrec.framework.opengl.v3;
 
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.util.Log;
+import android.view.Surface;
 
 import java.io.IOException;
 import java.util.List;
@@ -19,37 +21,65 @@ import co.astrnt.medrec.medrec.framework.opengl.v3.type.ScriptedObject2D;
 public class Camera extends ScriptedObject2D implements SurfaceTexture.OnFrameAvailableListener {
     private SurfaceTexture mSTexture;
     private android.hardware.Camera mCamera;
+    boolean open = true;
+    Scene mScene;
 
-    public Camera(Resources mResources) {
+    public Camera(Resources mResources, Scene mScene) {
         super(mResources);
+        this.mScene = mScene;
         addBuffer("cameraVertex", -1.0f, -1.0f, 1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 1.0f);
-        addBuffer("textureVertex", 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f);
+        addBuffer("textureVertex", 0f, 1f, 0f, 0f, 1f, 1f, 1f, 0f);
         textureCamera = createTexture();
         applyCamera(textureCamera);
 
     }
+
+    public Camera(Resources mResources, int textureCamera, Scene mScene) {
+        super(mResources);
+        this.mScene = mScene;
+        addBuffer("cameraVertex", -1.0f, -1.0f, 1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 1.0f);
+        addBuffer("textureVertex", 0f, 1f, 0f, 0f, 1f, 1f, 1f, 0f);
+        this.textureCamera = textureCamera;
+        applyCamera(textureCamera, false);
+    }
+
+    public int getTextureCamera() {
+        return textureCamera;
+    }
+
     int textureCamera;
 
+    public void logArray(float[] array) {
+        for (int i = 0; i < array.length; i++) {
+            Log.e("ARR#", i + " " + array[i] + "  " + " " + open);
+        }
 
-
+    }
 
     @Override
     public void draw() {
         beginDraw();
         updateTexture();
-        float[] trans = new float[16];
-        mSTexture.getTransformMatrix(trans);
+
+
         float[] mat = new float[16];
-        Matrix.setIdentityM(mat,0);
-        fillMatrix("uMVP",mat);
-        fillMatrix("uSTm", trans);
+        Matrix.setIdentityM(mat, 0);
+        fillMatrix("uMVP", mat);
+        fillMatrix("uSTm", mat);
         enableVertices("cameraVertex", "vPosition");
         enableVertices("textureVertex", "vTexCoord");
         fillUniform("sTexture", 0.0f);
-        activeTexture(hTex[0]);
+        activeTexture(textureCamera);
         GLES20.glDrawArrays(5, 0, 4);
         endDraw();
 
+    }
+
+    @Override
+    public void onUpdateViewPort(Scene scene,  int width, int height,int i) {
+        if(i == Surface.ROTATION_90){
+            addBuffer("textureVertex", 1f, 1f, 0f, 1f, 1f, 0f, 0f, 0f);
+        }
     }
 
     @Override
@@ -62,11 +92,11 @@ public class Camera extends ScriptedObject2D implements SurfaceTexture.OnFrameAv
         return R.raw.cam_f;
     }
 
-    int[] hTex;
+    //int[] hTex;
 
     public int createTexture() {
 
-        hTex = new int[1];
+        int[] hTex = new int[1];
         GLES20.glGenTextures(1, hTex, 0);
         GLES20.glBindTexture(36197, hTex[0]);
         GLES20.glTexParameteri(36197, 10242, 33071);
@@ -93,6 +123,22 @@ public class Camera extends ScriptedObject2D implements SurfaceTexture.OnFrameAv
         GLES20.glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
     }
 
+    public void applyCamera(int textureId, boolean open) {
+        this.open = open;
+        this.mSTexture = new SurfaceTexture(textureId);
+        this.mSTexture.setOnFrameAvailableListener(this);
+        if (open) {
+            this.mCamera = android.hardware.Camera.open(android.hardware.Camera.CameraInfo.CAMERA_FACING_FRONT);
+            mCamera.getParameters().set("orientation", "portrait");
+            mCamera.getParameters().set("rotation", -90);
+            try {
+                this.mCamera.setPreviewTexture(this.mSTexture);
+            } catch (IOException e) {
+            }
+        }
+        GLES20.glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
+    }
+
     boolean updateTexture;
 
     @Override
@@ -114,29 +160,30 @@ public class Camera extends ScriptedObject2D implements SurfaceTexture.OnFrameAv
         GLES20.glActiveTexture(33984);
         GLES20.glBindTexture(36197, textureId);
     }
+    android.hardware.Camera.Size videoSize;
 
-    public void startPreview(int width, int height) {
+    public android.hardware.Camera.Size getVideoSize() {
+        return videoSize;
+    }
 
-            android.hardware.Camera.Parameters param = this.mCamera.getParameters();
-            List<android.hardware.Camera.Size> psize = param.getSupportedPreviewSizes();
-            if (psize.size() > 0) {
-                int i = 0;
-                while (i < psize.size() && ((android.hardware.Camera.Size) psize.get(i)).width >= width && ((android.hardware.Camera.Size) psize.get(i)).height >= height) {
-                    i++;
-                }
-                if (i > 0) {
-                    i--;
-                }
-                param.setPreviewSize(((android.hardware.Camera.Size) psize.get(i)).width, ((android.hardware.Camera.Size) psize.get(i)).height);
+    public void startPreview(int width, int height, int orientation) {
+        android.hardware.Camera.Parameters param = this.mCamera.getParameters();
+        List<android.hardware.Camera.Size> psize = param.getSupportedPreviewSizes();
+
+        for (android.hardware.Camera.Size size : psize) {
+            if( size.width > height){
+                videoSize = size;
+                log("choosing "+size.width+" "+size.height);
+                param.setPreviewSize(size.width,size.height);
+                break;
             }
-            mCamera.getParameters().set("orientation", "portrait");
-            mCamera.getParameters().set("rotation", -90);
-            param.set("orientation", "portrait");
+        }
 
-            this.mCamera.setParameters(param);
-
-            this.mCamera.startPreview();
-
+        mCamera.getParameters().set("orientation", "portrait");
+        mCamera.getParameters().set("rotation", -90);
+        param.set("orientation", "portrait");
+        this.mCamera.setParameters(param);
+        this.mCamera.startPreview();
     }
 
     public static void log(String s) {

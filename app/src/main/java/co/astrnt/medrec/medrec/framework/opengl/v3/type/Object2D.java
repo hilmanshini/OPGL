@@ -1,5 +1,7 @@
 package co.astrnt.medrec.medrec.framework.opengl.v3.type;
 
+import co.astrnt.medrec.medrec.framework.opengl.v3.Scene;
+
 /**
  * Created by hill on 7/16/17.
  */
@@ -95,4 +97,6 @@ public abstract class Object2D {
         this.fragmentShaderPointer = fragmentShaderPointer;
     }
     public abstract void draw();
+
+    public abstract void onUpdateViewPort(Scene scene,  int width, int height,int orientation) ;
 }

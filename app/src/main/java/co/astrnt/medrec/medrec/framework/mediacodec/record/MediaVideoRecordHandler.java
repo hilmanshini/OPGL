@@ -1,17 +1,18 @@
 package co.astrnt.medrec.medrec.framework.mediacodec.record;
 
 import android.content.res.Resources;
+import android.media.MediaCodec;
+import android.media.MediaFormat;
 import android.media.MediaMuxer;
 import android.opengl.EGLContext;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
-import android.util.Log;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
+import co.astrnt.medrec.medrec.framework.opengl.IDrawer;
 import co.astrnt.medrec.medrec.framework.opengl.v2.Drawer;
 import imageogl.view.opengl_x.mediacodec.VideoCodec;
 
@@ -22,29 +23,30 @@ import imageogl.view.opengl_x.mediacodec.VideoCodec;
 public class MediaVideoRecordHandler extends Handler {
     private int frame;
     private MediaVideoRecord mMediaVideoRecord;
-    private Drawer mDrawer;
+    private IDrawer mDrawer;
     Resources mResources;
-
-    public MediaVideoRecordHandler(Looper looper, MediaVideoRecord mMediaVideoRecord, Drawer mDrawer, Resources mResources) {
+    Listener mListener;
+    public MediaVideoRecordHandler(Looper looper, MediaVideoRecord mMediaVideoRecord, IDrawer mDrawer, Resources mResources, Listener mListener) {
         super(looper);
+        this.mListener = mListener;
         this.mMediaVideoRecord = mMediaVideoRecord;
         this.mDrawer = mDrawer;
         this.mResources = mResources;
     }
 
-    public static MediaVideoRecordHandler start(Resources mResources, Drawer mDrawer, Listener mListener, int width, int height, MediaMuxer mediaMuxer) throws IOException {
+    public static CompressedMediaVideoRecordHandler start(Resources mResources, IDrawer mDrawer, Listener mListener, int width, int height, MediaMuxer mediaMuxer) throws IOException {
         HandlerThread handlerThread = new HandlerThread("VCodec");
         handlerThread.start();
         MediaVideoRecord mMediaVideoRecord = new MediaVideoRecord(mResources, mListener, width, height, mediaMuxer);
-        MediaVideoRecordHandler self = new MediaVideoRecordHandler(handlerThread.getLooper(), mMediaVideoRecord, mDrawer, mResources);
+        CompressedMediaVideoRecordHandler self = new CompressedMediaVideoRecordHandler(handlerThread.getLooper(), mMediaVideoRecord, mDrawer, mResources,mListener);
         return self;
     }
 
-    public static MediaVideoRecordHandler start(Resources mResources, Drawer mDrawer, EGLContext eglContext, Listener mListener, int width, int height, MediaMuxer mediaMuxer) throws IOException {
+    public static CompressedMediaVideoRecordHandler start(Resources mResources, IDrawer mDrawer, EGLContext eglContext, Listener mListener, int width, int height, MediaMuxer mediaMuxer) throws IOException {
         HandlerThread handlerThread = new HandlerThread("VCodec");
         handlerThread.start();
         MediaVideoRecord mMediaVideoRecord = new MediaVideoRecord(mResources, eglContext, mListener, width, height, mediaMuxer);
-        MediaVideoRecordHandler self = new MediaVideoRecordHandler(handlerThread.getLooper(), mMediaVideoRecord, mDrawer, mResources);
+        CompressedMediaVideoRecordHandler self = new CompressedMediaVideoRecordHandler(handlerThread.getLooper(), mMediaVideoRecord, mDrawer, mResources, mListener);
         return self;
     }
 
@@ -81,12 +83,13 @@ public class MediaVideoRecordHandler extends Handler {
             } else if (msg.what == VideoCodec.INIT) {
                 mMediaVideoRecord.makeCurrent();
                 int[] xy = (int[]) msg.obj;
-                mDrawer = new Drawer(mResources);
+//                mDrawer = new Drawer(mResources);
+                mDrawer = mListener.getDrawerMediaCodecInit();
                 mDrawer.onSurfaceChanged(xy[0], xy[1]);
             } else if (msg.what == VideoCodec.INIT_CAMERA) {
                 mMediaVideoRecord.makeCurrent();
                 int[] xy = (int[]) msg.obj;
-                mDrawer = new Drawer(mResources, ((int[]) msg.obj)[2]);
+                mDrawer = mListener.getDrawerMediaCodecInitCamera(msg.obj);
                 mDrawer.onSurfaceChanged(xy[0], xy[1]);
             }
         }
@@ -102,5 +105,18 @@ public class MediaVideoRecordHandler extends Handler {
         message.obj = object;
         sendMessage(message);
     }
+    public interface Listener {
+        void onFinish();
 
+        void onGetFormatToMuxer(MediaFormat newFormat, int mTrackIndex);
+
+        void onPrepared(MediaCodec mMediaCodec);
+
+        void onWriteDataToMuxer(int mTrackIndex, boolean eos, MediaCodec.BufferInfo mBufferInfo);
+
+        IDrawer getDrawerMediaCodecInit();
+
+        IDrawer getDrawerMediaCodecInitCamera(Object obj);
+
+    }
 }

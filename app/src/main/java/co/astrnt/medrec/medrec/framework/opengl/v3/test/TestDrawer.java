@@ -1,10 +1,7 @@
 package co.astrnt.medrec.medrec.framework.opengl.v3.test;
 
 import android.content.res.Resources;
-import android.opengl.GLES20;
-import android.opengl.GLSurfaceView;
 import android.opengl.GLSurfaceView.Renderer;
-import android.util.Log;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -31,7 +28,7 @@ public class TestDrawer implements Renderer {
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         mScene = new Scene(mResources, 255, 0, 255, 100);
-        mCamera = new Camera(mResources);
+        mCamera = new Camera(mResources,mScene);
         mPicture = new Picture(mResources,android.R.drawable.ic_media_play);
         mPicture.addBuffer("positionVertex", 0.5f, 0.5f, 0.5f, -0.5f, -0.5f, -0.5f, -0.5f, 0.5f);
         mScene.addOBject(mCamera);
@@ -42,8 +39,8 @@ public class TestDrawer implements Renderer {
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
-        mScene.updateViewPort(width, height);
-        mCamera.startPreview(width, height);
+        mScene.updateViewPort(width, width, mResources.getConfiguration().orientation);
+        mCamera.startPreview(width, height,mResources.getConfiguration().orientation);
     }
 
     @Override

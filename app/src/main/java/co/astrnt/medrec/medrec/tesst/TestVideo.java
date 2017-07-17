@@ -1,4 +1,4 @@
-package co.astrnt.medrec.medrec.framework.mediacodec.record;
+package co.astrnt.medrec.medrec.tesst;
 
 import android.app.Activity;
 import android.content.Context;
@@ -18,6 +18,9 @@ import java.io.IOException;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import co.astrnt.medrec.medrec.framework.mediacodec.record.CompressedMediaVideoRecordHandler;
+import co.astrnt.medrec.medrec.framework.mediacodec.record.MediaVideoRecordHandler;
+import co.astrnt.medrec.medrec.framework.opengl.IDrawer;
 import co.astrnt.medrec.medrec.framework.opengl.v2.Drawer;
 import imageogl.view.opengl_x.mediacodec.VideoCodec;
 
@@ -62,7 +65,7 @@ public class TestVideo extends Activity {
             }
             mDrawerDisplay = new Drawer(getResources());
             try {
-                mMediaVideoRecordHandler = CompressedMediaVideoRecordHandler.start(getResources(), mDrawerDisplay, EGL14.eglGetCurrentContext(), new Listener() {
+                mMediaVideoRecordHandler = CompressedMediaVideoRecordHandler.start(getResources(), mDrawerDisplay, EGL14.eglGetCurrentContext(), new MediaVideoRecordHandler.Listener() {
                     @Override
                     public void onFinish() {
 
@@ -82,6 +85,16 @@ public class TestVideo extends Activity {
                     public void onWriteDataToMuxer(int mTrackIndex, boolean eos, MediaCodec.BufferInfo mBufferInfo) {
 
                     }
+
+                    @Override
+                    public IDrawer getDrawerMediaCodecInit() {
+                        return new Drawer(getResources());
+                    }
+
+                    @Override
+                    public IDrawer getDrawerMediaCodecInitCamera(Object obj) {
+                        return new Drawer(getResources(), ((int[]) obj)[2]);
+                    }
                 }, 600, 800, mediaMuxer);
             } catch (IOException e) {
                 Log.e("STATEX", "FAILED TO START CODEDC");
@@ -96,8 +109,8 @@ public class TestVideo extends Activity {
 
         @Override
         public void onDrawFrame(GL10 gl) {
-            mDrawerDisplay.draw(0, 0);
-            mMediaVideoRecordHandler.sendMessage(VideoCodec.DRAW_FRAME, new float[]{0, 0});
+            mDrawerDisplay.draw(0f, 0f);
+            mMediaVideoRecordHandler.sendMessage(VideoCodec.DRAW_FRAME, new float[]{0f, 0f});
         }
     }
 
