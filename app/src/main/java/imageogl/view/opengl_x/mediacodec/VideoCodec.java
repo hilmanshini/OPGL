@@ -23,6 +23,7 @@ import co.astrnt.medrec.medrec.framework.opengl.v2.CodecInputSurface;
 import co.astrnt.medrec.medrec.framework.opengl.v2.Drawer;
 
 public class VideoCodec {
+    public static final int SAMPLING = 4;
     public static int DRAW_FRAME = 0;
     private static final int FRAME_RATE = 30;
     public static int INIT = 2;

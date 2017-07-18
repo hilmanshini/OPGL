@@ -22,7 +22,6 @@ import co.astrnt.medrec.medrec.framework.mediacodec.record.CompressedMediaVideoR
 import co.astrnt.medrec.medrec.framework.mediacodec.record.MediaVideoRecordHandler;
 import co.astrnt.medrec.medrec.framework.opengl.IDrawer;
 import co.astrnt.medrec.medrec.framework.opengl.v2.Drawer;
-import imageogl.view.opengl_x.mediacodec.VideoCodec;
 
 /**
  * Created by hill on 7/10/17.
@@ -72,8 +71,9 @@ public class TestVideo extends Activity {
                     }
 
                     @Override
-                    public void onGetFormatToMuxer(MediaFormat newFormat, int mTrackIndex) {
+                    public boolean onGetFormatToMuxer(MediaFormat newFormat, int mTrackIndex) {
                         mediaMuxer.start();
+                        return false;
                     }
 
                     @Override
@@ -99,7 +99,7 @@ public class TestVideo extends Activity {
             } catch (IOException e) {
                 Log.e("STATEX", "FAILED TO START CODEDC");
             }
-            mMediaVideoRecordHandler.sendMessage(VideoCodec.INIT_CAMERA, new int[]{600, 800, mDrawerDisplay.textureCamera});
+            mMediaVideoRecordHandler.initCamera(600,800,mDrawerDisplay.textureCamera);
         }
 
         @Override
@@ -110,7 +110,7 @@ public class TestVideo extends Activity {
         @Override
         public void onDrawFrame(GL10 gl) {
             mDrawerDisplay.draw(0f, 0f);
-            mMediaVideoRecordHandler.sendMessage(VideoCodec.DRAW_FRAME, new float[]{0f, 0f});
+            mMediaVideoRecordHandler.drawFrame(0,0);
         }
     }
 
@@ -119,7 +119,7 @@ public class TestVideo extends Activity {
 
         if (mMediaVideoRecordHandler != null) {
             Toast.makeText(this, "Please Wait", Toast.LENGTH_LONG).show();
-            mMediaVideoRecordHandler.sendMessage(VideoCodec.TERMINATE, new Object());
+            mMediaVideoRecordHandler.terminate();
         }
 
     }

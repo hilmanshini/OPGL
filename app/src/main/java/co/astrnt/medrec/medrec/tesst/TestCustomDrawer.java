@@ -11,9 +11,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import android.view.Display;
 import android.view.Surface;
-import android.view.WindowManager;
 import android.widget.Toast;
 
 import java.io.File;
@@ -26,7 +24,6 @@ import co.astrnt.medrec.medrec.R;
 import co.astrnt.medrec.medrec.framework.mediacodec.record.CompressedMediaVideoRecordHandler;
 import co.astrnt.medrec.medrec.framework.mediacodec.record.MediaVideoRecordHandler;
 import co.astrnt.medrec.medrec.framework.opengl.IDrawer;
-import co.astrnt.medrec.medrec.framework.opengl.v2.Drawer;
 import co.astrnt.medrec.medrec.framework.opengl.v3.Camera;
 import co.astrnt.medrec.medrec.framework.opengl.v3.Picture;
 import co.astrnt.medrec.medrec.framework.opengl.v3.Scene;
@@ -143,8 +140,9 @@ public class TestCustomDrawer extends Activity {
                     }
 
                     @Override
-                    public void onGetFormatToMuxer(MediaFormat newFormat, int mTrackIndex) {
+                    public boolean onGetFormatToMuxer(MediaFormat newFormat, int mTrackIndex) {
                         mediaMuxer.start();
+                        return false;
                     }
 
                     @Override

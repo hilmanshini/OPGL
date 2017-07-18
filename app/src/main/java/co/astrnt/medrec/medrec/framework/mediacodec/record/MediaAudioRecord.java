@@ -11,8 +11,9 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.concurrent.TimeUnit;
 
-import co.astrnt.medrec.medrec.framework.mediacodec.record.MediaAudioRecordHandler.Listener;
+
 
 /**
  * Created by hill on 7/11/17.
@@ -86,9 +87,47 @@ public class MediaAudioRecord {
             MediaRecorder.AudioSource.VOICE_RECOGNITION,
     };
     int trackIndex;
+    boolean hasNewFormat = false;
+    boolean sampling;
 
+    public void sampling() {
+        while (!hasNewFormat) {
+            encode(0, false);
+        }
+    }
+
+    MediaFormat newFormat;
+    Object lock = new Object();
+
+    public MediaFormat getNewFormat() {
+        if (newFormat == null) {
+            synchronized (lock) {
+                try {
+                    lock.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return newFormat;
+    }
+
+    public int getNewTrackIndex() {
+        if (newFormat == null) {
+            synchronized (lock) {
+                try {
+                    lock.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return trackIndex;
+    }
+    long startTime = -1;
     public void encode(long time, boolean eos) {
-        Log.e(">>>>>>>>>>>>.DEQFLAG", " " + time + " " + eos);
+
+        time = time /1000l;
         ByteBuffer[] buffers = mMediaCodec.getInputBuffers();
         ByteBuffer[] outBuffers = mMediaCodec.getOutputBuffers();
         int index = mMediaCodec.dequeueInputBuffer(TIMEOUT_US);
@@ -106,6 +145,8 @@ public class MediaAudioRecord {
             Log.e("AUDIORX", "READ = " + readBytes);
             bufferRecord.position(readBytes);
             bufferRecord.flip();
+
+            Log.e("DEQTIMEE"," "+ TimeUnit.NANOSECONDS.toMillis(time));
             usedBuffer.put(bufferRecord);
             if (!eos) {
                 mMediaCodec.queueInputBuffer(index, 0, readBytes, time, 0);
@@ -113,11 +154,13 @@ public class MediaAudioRecord {
                 mMediaCodec.queueInputBuffer(index, 0, readBytes, time, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
             }
         }
+        boolean writeToMuxer = false;
 
         int status = 0;
         while (true) {
             status = mMediaCodec.dequeueOutputBuffer(mBufferInfo, TIMEOUT_US);
-            Log.e("DEQOUTPUT", " " + index);
+            Log.e(">>>>>>>>>>>>@@.DEQFLAG", " " + status);
+            Log.e("DEQOUTPUT", " " + index+" "+eos);
             if (status == MediaCodec.INFO_TRY_AGAIN_LATER) {
                 if (!eos) {
                     break;
@@ -125,28 +168,40 @@ public class MediaAudioRecord {
             } else if (status == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
                 outBuffers = mMediaCodec.getOutputBuffers();
             } else if (status == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
-                MediaFormat newFormat = mMediaCodec.getOutputFormat();
+                newFormat = mMediaCodec.getOutputFormat();
                 trackIndex = mediaMuxer.addTrack(newFormat);
-                mListener.onGetFormatToMuxer(newFormat, trackIndex);
+                synchronized (lock) {
+                    lock.notifyAll();
+                }
+                boolean breakLoop = mListener.onGetFormatToMuxer(newFormat, trackIndex);
+                hasNewFormat = true;
+                if (breakLoop) {
+                    break;
+                }
             } else if (status < 0) {
                 // ??
             } else {
                 ByteBuffer encodedBuffer = outBuffers[status];
                 if (mBufferInfo.size != 0) {
+
                     encodedBuffer.position(mBufferInfo.offset);
 
+                    Log.e(">>>>>>>>>>>>>>.DEQFLAG", " " + time + " " + eos+" "+TimeUnit.NANOSECONDS.toMillis(time)+" "+TimeUnit.NANOSECONDS.toMillis(mBufferInfo.presentationTimeUs));
                     encodedBuffer.limit(mBufferInfo.offset + mBufferInfo.size);
-                    Log.e("DEQWRITE", "WRITING " + mBufferInfo.size + " " + mBufferInfo.presentationTimeUs + " " + eos + " " + mBufferInfo.flags);
+                    Log.e("DEQTIME"," "+ TimeUnit.NANOSECONDS.toNanos(mBufferInfo.presentationTimeUs));
+                    Log.e("DEQWRITE1", "WRITING " + mBufferInfo.size + " " + mBufferInfo.presentationTimeUs + " " + eos + " " + mBufferInfo.flags+" "+mBufferInfo.size);
                     mediaMuxer.writeSampleData(trackIndex, encodedBuffer, mBufferInfo);
                     mListener.onWriteDataToMuxer(trackIndex, eos, mBufferInfo);
                 }
+
                 mMediaCodec.releaseOutputBuffer(status, false);
+                break;
             }
             if (eos) {
                 break;
             }
         }
-
+        Log.e(">>>>>>>>>>>>.DEQFLAG", " " + time + " " + eos+" "+TimeUnit.NANOSECONDS.toMillis(time)+" "+status);
 
     }
 
@@ -161,6 +216,30 @@ public class MediaAudioRecord {
 
 
     }
+    /**
+     * previous presentationTimeUs for writing
+     */
+    private long prevOutputPTSUs = 0;
+    /**
+     * get next encoding presentationTimeUs
+     * @return
+     */
+    protected long getPTSUs() {
+        long result = System.nanoTime() / 1000L;
+        // presentationTimeUs should be monotonic
+        // otherwise muxer fail to write
+        if (result < prevOutputPTSUs)
+            result = (prevOutputPTSUs - result) + result;
+        return result;
+    }
+    public interface Listener {
+        void onFinish();
 
+        boolean onGetFormatToMuxer(MediaFormat newFormat, int mTrackIndex);
 
+        void onPrepared(MediaCodec mMediaCodec);
+
+        void onWriteDataToMuxer(int mTrackIndex, boolean eos, MediaCodec.BufferInfo mBufferInfo);
+
+    }
 }

@@ -5,10 +5,16 @@ import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.media.MediaMuxer;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
+import android.util.Log;
+import android.view.View;
+import android.widget.LinearLayout;
 
+import java.io.File;
 import java.io.IOException;
 
+import co.astrnt.medrec.medrec.framework.mediacodec.record.MediaAudioRecord;
 import co.astrnt.medrec.medrec.framework.mediacodec.record.MediaAudioRecordHandler;
 import co.astrnt.medrec.medrec.framework.opengl.IDrawer;
 
@@ -20,17 +26,21 @@ public class TestAudio extends Activity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
         try {
+            new File("/sdcard/ee333.mp4").delete();
             final MediaMuxer mediaMuxer = new MediaMuxer("/sdcard/ee333.mp4", MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
-            MediaAudioRecordHandler mediaAudioRecordHandler = MediaAudioRecordHandler.start(new MediaAudioRecordHandler.Listener() {
+            final MediaAudioRecordHandler mediaAudioRecordHandler = MediaAudioRecordHandler.start(new MediaAudioRecord.Listener() {
                 @Override
                 public void onFinish() {
 
                 }
 
                 @Override
-                public void onGetFormatToMuxer(MediaFormat newFormat, int mTrackIndex) {
+                public boolean onGetFormatToMuxer(MediaFormat newFormat, int mTrackIndex) {
                     mediaMuxer.start();
+                    return false;
                 }
 
                 @Override
@@ -46,33 +56,52 @@ public class TestAudio extends Activity {
                     }
                 }
 
-                @Override
-                public IDrawer getDrawerMediaCodecInit() {
-                    return null;
-                }
 
-                @Override
-                public IDrawer getDrawerMediaCodecInitCamera(Object obj) {
-                    return null;
-                }
             }, mediaMuxer);
-            long i = 500l;
-            long startTIme = System.nanoTime();
-            mediaAudioRecordHandler.sendEmptyMessage(MediaAudioRecordHandler.INIT);
-            for (int i1 = 0; i1 < i; i1++) {
-                Object[] data = new Object[]{
-                        System.nanoTime() - startTIme, false
-                };
-                mediaAudioRecordHandler.sendMessage(mediaAudioRecordHandler.obtainMessage(MediaAudioRecordHandler.CAPTURE, data));
-            }
-            Object[] data = new Object[]{
-                    System.nanoTime() - startTIme, true
-            };
-            mediaAudioRecordHandler.sendMessage(mediaAudioRecordHandler.obtainMessage(MediaAudioRecordHandler.CAPTURE, data));
-            mediaAudioRecordHandler.sendEmptyMessage(MediaAudioRecordHandler.TERMINATE);
+            mediaAudioRecordHandler.Internalinit();
+            LinearLayout mLinearLayout = new LinearLayout(this);
+            final Looping l = new Looping(mediaAudioRecordHandler);
+            l.start();
+            setContentView(mLinearLayout);
+            mLinearLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.e("DEQWRITE","STOPPING");
+                    l.stop = true;
+                }
+            });
 
         } catch (IOException e) {
             e.printStackTrace();
+        }
+
+
+    }
+
+    class Looping extends Thread {
+        MediaAudioRecordHandler mediaAudioRecordHandler;
+        boolean stop = false;
+
+        public Looping(MediaAudioRecordHandler mediaAudioRecordHandler) {
+            this.mediaAudioRecordHandler = mediaAudioRecordHandler;
+        }
+
+        @Override
+        public void run() {
+            long startTIme = System.nanoTime();
+
+            while (!stop) {
+                Log.e("DEQWRITE","loop "+stop+" ");;
+                long i = 600l;
+
+                mediaAudioRecordHandler.getmMediaAudioRecord().encode(System.nanoTime() - startTIme, false);
+
+            }
+            mediaAudioRecordHandler.getmMediaAudioRecord().encode(System.nanoTime() - startTIme, true);
+
+            mediaAudioRecordHandler.getmMediaAudioRecord().release();
+
+
         }
     }
 }

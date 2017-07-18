@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 
 import java.io.IOException;
 
@@ -17,6 +18,7 @@ import co.astrnt.medrec.medrec.framework.opengl.v2.Drawer;
 import imageogl.view.opengl_x.mediacodec.VideoCodec;
 
 /**
+
  * Created by hill on 7/10/17.
  */
 
@@ -66,6 +68,7 @@ public class MediaVideoRecordHandler extends Handler {
                 }
                 if(isValidTiming(time,startTime)){
                     float[] xy = (float[]) msg.obj;
+                    Log.e("VideoThread", "handleMessage: vidtime: "+time);
                     mMediaVideoRecord.drain(false);
                     mDrawer.clear();
                     mDrawer.draw((float) xy[0], (float) xy[1]);
@@ -91,6 +94,8 @@ public class MediaVideoRecordHandler extends Handler {
                 int[] xy = (int[]) msg.obj;
                 mDrawer = mListener.getDrawerMediaCodecInitCamera(msg.obj);
                 mDrawer.onSurfaceChanged(xy[0], xy[1]);
+            } else if(msg.what == VideoCodec.SAMPLING){
+                mMediaVideoRecord.sampling();
             }
         }
     }
@@ -108,7 +113,7 @@ public class MediaVideoRecordHandler extends Handler {
     public interface Listener {
         void onFinish();
 
-        void onGetFormatToMuxer(MediaFormat newFormat, int mTrackIndex);
+        boolean onGetFormatToMuxer(MediaFormat newFormat, int mTrackIndex);
 
         void onPrepared(MediaCodec mMediaCodec);
 
@@ -119,4 +124,14 @@ public class MediaVideoRecordHandler extends Handler {
         IDrawer getDrawerMediaCodecInitCamera(Object obj);
 
     }
+    public void initCamera(int width,int height,int textureCamera){
+        sendMessage(VideoCodec.INIT_CAMERA, new int[]{width,height,textureCamera});
+    }
+    public void drawFrame(float x,float y){
+        sendMessage(VideoCodec.DRAW_FRAME, new float[]{x,y});
+    }
+    public void terminate(){
+        sendMessage(VideoCodec.TERMINATE, new Object());
+    }
+
 }

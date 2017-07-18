@@ -10,6 +10,7 @@ import android.view.Surface;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+
 import co.astrnt.medrec.medrec.framework.mediacodec.record.MediaVideoRecordHandler.Listener;
 import co.astrnt.medrec.medrec.framework.mediacodec.MediaFormatFactory;
 import co.astrnt.medrec.medrec.framework.opengl.v2.CodecInputSurface;
@@ -29,7 +30,7 @@ public class MediaVideoRecord {
     private MediaCodec.BufferInfo mBufferInfo = new MediaCodec.BufferInfo();
     private int mTrackIndex;
 
-    public MediaVideoRecord(Resources mResources, Listener listener, int width, int height,MediaMuxer mMuxer) throws IOException {
+    public MediaVideoRecord(Resources mResources, Listener listener, int width, int height, MediaMuxer mMuxer) throws IOException {
         this.mResources = mResources;
         this.listener = listener;
         MediaFormat format = MediaFormat.createVideoFormat("video/avc", width, height);
@@ -45,10 +46,10 @@ public class MediaVideoRecord {
         this.mMediaCodec.start();
         listener.onPrepared(mMediaCodec);
         this.mMuxer = mMuxer;
-        this.mMuxer.setOrientationHint(270);
+        //this.mMuxer.setOrientationHint(270);
     }
 
-    public MediaVideoRecord(Resources resources, EGLContext eglContext, Listener listener, int width, int height,MediaMuxer mMuxer) throws IOException {
+    public MediaVideoRecord(Resources resources, EGLContext eglContext, Listener listener, int width, int height, MediaMuxer mMuxer) throws IOException {
         this.mResources = resources;
         this.listener = listener;
         this.outputFormat = MediaFormatFactory.createStandardFormat(width, height);
@@ -59,7 +60,7 @@ public class MediaVideoRecord {
         this.mMediaCodec.start();
         listener.onPrepared(mMediaCodec);
         this.mMuxer = mMuxer;
-        this.mMuxer.setOrientationHint(0);
+        //   this.mMuxer.setOrientationHint(0);
     }
 
     protected void release() {
@@ -79,15 +80,28 @@ public class MediaVideoRecord {
         }
     }
 
+    boolean hasNewFormat = false;
 
-
+    public void sampling() {
+        while (!hasNewFormat) {
+            drain(false);
+        }
+    }
+    boolean disposed;
     public void drain(boolean eos) {
-        if (mMediaCodec == null) {
+        Log.e("HILGL_MANAGER>>>> "," "+eos);
+
+
+
+        if (mMediaCodec == null || disposed) {
+
             return;
         }
+        disposed = eos;
         ByteBuffer[] encoderOutputBuffers = this.mMediaCodec.getOutputBuffers();
         while (true) {
             int encoderStatus = this.mMediaCodec.dequeueOutputBuffer(this.mBufferInfo, 10000);
+            Log.e("VDECSTATE", " " + encoderStatus);;
             if (encoderStatus == MediaCodec.INFO_TRY_AGAIN_LATER) {
                 if (!eos) {
                     break;
@@ -100,9 +114,11 @@ public class MediaVideoRecord {
                 MediaFormat newFormat = this.mMediaCodec.getOutputFormat();
                 Log.e("VDECFOR", " " + newFormat);
                 this.mTrackIndex = this.mMuxer.addTrack(newFormat);
-                listener.onGetFormatToMuxer(newFormat,mTrackIndex);
-
-
+                boolean breakLoop = listener.onGetFormatToMuxer(newFormat, mTrackIndex);
+                hasNewFormat = true;
+                if(breakLoop){
+                    break;
+                }
             } else if (encoderStatus < 0) {
                 //fail?
             } else {
@@ -117,7 +133,7 @@ public class MediaVideoRecord {
                     encodedData.limit(mBufferInfo.offset + mBufferInfo.size);
 
                     mMuxer.writeSampleData(mTrackIndex, encodedData, mBufferInfo);
-                    listener.onWriteDataToMuxer(mTrackIndex, eos,mBufferInfo);
+                    listener.onWriteDataToMuxer(mTrackIndex, eos, mBufferInfo);
                 }
                 mMediaCodec.releaseOutputBuffer(encoderStatus, false);
             }
