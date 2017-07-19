@@ -99,6 +99,11 @@ public class TestCustomDrawer extends Activity {
             mScene.pack();
         }
 
+        @Override
+        public void release() {
+
+        }
+
     }
 
     private CompressedMediaVideoRecordHandler mMediaVideoRecordHandler;

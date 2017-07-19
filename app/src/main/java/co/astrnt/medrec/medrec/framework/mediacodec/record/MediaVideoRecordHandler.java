@@ -83,6 +83,7 @@ public class MediaVideoRecordHandler extends Handler {
             } else if (msg.what == VideoCodec.TERMINATE) {
                 mMediaVideoRecord.drain(true);
                 mMediaVideoRecord.release();
+                mDrawer.release();
             } else if (msg.what == VideoCodec.INIT) {
                 mMediaVideoRecord.makeCurrent();
                 int[] xy = (int[]) msg.obj;

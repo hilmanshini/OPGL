@@ -200,4 +200,11 @@ public class Camera extends ScriptedObject2D implements SurfaceTexture.OnFrameAv
         Matrix.setIdentityM(matrix, 0);
         fillMatrix(name, matrix);
     }
+
+    @Override
+    public void release() {
+        super.release();
+        GLES20.glDeleteTextures(1,new int[]{textureCamera},0);
+        mCamera.release();
+    }
 }

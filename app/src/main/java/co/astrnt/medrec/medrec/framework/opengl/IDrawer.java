@@ -10,4 +10,6 @@ public interface IDrawer {
     public void draw(Object... params);
     public void clear();
     public void onSurfaceCreated();
+
+    void release();
 }

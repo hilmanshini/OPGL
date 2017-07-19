@@ -142,4 +142,9 @@ public class Drawer implements IDrawer{
     public void onSurfaceCreated() {
 
     }
+
+    @Override
+    public void release() {
+
+    }
 }

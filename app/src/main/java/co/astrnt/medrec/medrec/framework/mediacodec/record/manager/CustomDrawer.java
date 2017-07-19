@@ -67,4 +67,11 @@ public class CustomDrawer implements IDrawer {
         mScene.pack();
     }
 
+    @Override
+    public void release() {
+        mCamera.release();
+        mPicture.release();
+        mScene.release();
+    }
+
 }
