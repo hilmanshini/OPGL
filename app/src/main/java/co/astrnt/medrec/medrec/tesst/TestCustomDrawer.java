@@ -22,6 +22,7 @@ import javax.microedition.khronos.opengles.GL10;
 
 import co.astrnt.medrec.medrec.R;
 import co.astrnt.medrec.medrec.framework.mediacodec.record.CompressedMediaVideoRecordHandler;
+import co.astrnt.medrec.medrec.framework.mediacodec.record.MediaVideoRecord;
 import co.astrnt.medrec.medrec.framework.mediacodec.record.MediaVideoRecordHandler;
 import co.astrnt.medrec.medrec.framework.opengl.IDrawer;
 import co.astrnt.medrec.medrec.framework.opengl.v3.Camera;
@@ -138,9 +139,9 @@ public class TestCustomDrawer extends Activity {
         public void onSurfaceChanged(GL10 gl, int width, int height) {
             mCustomDrawer.onSurfaceChanged(width, height);
             try {
-                mMediaVideoRecordHandler = CompressedMediaVideoRecordHandler.start(getResources(), mCustomDrawer, EGL14.eglGetCurrentContext(), new MediaVideoRecordHandler.Listener() {
+                mMediaVideoRecordHandler = CompressedMediaVideoRecordHandler.start(getResources(), mCustomDrawer, EGL14.eglGetCurrentContext(), new MediaVideoRecord.Listener() {
                     @Override
-                    public void onFinish() {
+                    public void onFinish(int track) {
 
                     }
 
@@ -172,6 +173,11 @@ public class TestCustomDrawer extends Activity {
                         CustomDrawer mCustomDrawer = new CustomDrawer(((int[]) obj)[2]);
                         mCustomDrawer.onSurfaceCreated();
                         return mCustomDrawer;
+                    }
+
+                    @Override
+                    public void waitForInit() {
+
                     }
                 }, width, height, mediaMuxer);
             } catch (IOException e) {

@@ -5,14 +5,16 @@ import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.media.MediaMuxer;
 import android.opengl.EGLContext;
+import android.os.HandlerThread;
 import android.util.Log;
 import android.view.Surface;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import co.astrnt.medrec.medrec.framework.mediacodec.record.MediaVideoRecordHandler.Listener;
+import co.astrnt.medrec.medrec.framework.mediacodec.record.MediaVideoRecord.Listener;
 import co.astrnt.medrec.medrec.framework.mediacodec.MediaFormatFactory;
+import co.astrnt.medrec.medrec.framework.opengl.IDrawer;
 import co.astrnt.medrec.medrec.framework.opengl.v2.CodecInputSurface;
 
 /**
@@ -29,6 +31,10 @@ public class MediaVideoRecord {
     private MediaFormat outputFormat;
     private MediaCodec.BufferInfo mBufferInfo = new MediaCodec.BufferInfo();
     private int mTrackIndex;
+
+    public int getmTrackIndex() {
+        return mTrackIndex;
+    }
 
     public MediaVideoRecord(Resources mResources, Listener listener, int width, int height, MediaMuxer mMuxer) throws IOException {
         this.mResources = mResources;
@@ -93,7 +99,7 @@ public class MediaVideoRecord {
 
 
 
-        if (mMediaCodec == null || disposed) {
+        if (mMediaCodec == null || disposed || stop) {
 
             return;
         }
@@ -164,5 +170,30 @@ public class MediaVideoRecord {
     public void makeCurrent() {
         this.codecInputSurface.makeCurrent();
     }
+    boolean stop = false;
+    public void stop() {
 
+        stop = true;
+    }
+
+    public boolean isStop() {
+        return stop;
+    }
+
+
+
+    public interface Listener {
+        void onFinish(int track);
+
+        boolean onGetFormatToMuxer(MediaFormat newFormat, int mTrackIndex);
+
+        void onPrepared(MediaCodec mMediaCodec);
+        void onWriteDataToMuxer(int mTrackIndex, boolean eos, MediaCodec.BufferInfo mBufferInfo);
+
+        IDrawer getDrawerMediaCodecInit();
+
+        IDrawer getDrawerMediaCodecInitCamera(Object obj);
+
+        void waitForInit();
+    }
 }

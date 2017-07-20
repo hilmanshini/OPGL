@@ -23,12 +23,12 @@ public class RectangleProgram extends BufferedProgram implements GLDrawable{
 
     @Override
     public int getVertexShaderResourceInt() {
-        return R.raw.simple_v;
+        return R.raw.script_simple_v;
     }
 
     @Override
     public int getFragmentShaderResourceInt() {
-        return R.raw.simple_f;
+        return R.raw.script_simple_f;
     }
 
 

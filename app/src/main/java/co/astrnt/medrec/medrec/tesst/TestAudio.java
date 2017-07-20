@@ -33,7 +33,7 @@ public class TestAudio extends Activity {
             final MediaMuxer mediaMuxer = new MediaMuxer("/sdcard/ee333.mp4", MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
             final MediaAudioRecordHandler mediaAudioRecordHandler = MediaAudioRecordHandler.start(new MediaAudioRecord.Listener() {
                 @Override
-                public void onFinish() {
+                public void onFinish(int track) {
 
                 }
 
@@ -54,6 +54,11 @@ public class TestAudio extends Activity {
                         mediaMuxer.stop();
                         mediaMuxer.release();
                     }
+                }
+
+                @Override
+                public void waitForInit() {
+
                 }
 
 

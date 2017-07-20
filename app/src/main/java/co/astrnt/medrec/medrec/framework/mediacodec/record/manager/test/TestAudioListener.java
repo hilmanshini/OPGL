@@ -1,27 +1,26 @@
-package co.astrnt.medrec.medrec.framework.mediacodec.record.manager;
+package co.astrnt.medrec.medrec.framework.mediacodec.record.manager.test;
 
 import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.media.MediaMuxer;
+import android.util.Log;
 
 import co.astrnt.medrec.medrec.framework.mediacodec.record.MediaAudioRecord;
-import co.astrnt.medrec.medrec.framework.mediacodec.record.MediaAudioRecordHandler;
-import co.astrnt.medrec.medrec.framework.opengl.IDrawer;
 
 /**
- * Created by hill on 7/18/17.
+ * Created by hill on 7/20/17.
  */
 
-public class AudioManager implements MediaAudioRecord.Listener {
+public class TestAudioListener implements MediaAudioRecord.Listener {
     MediaMuxer mediaMuxer;
 
-    public AudioManager(MediaMuxer mediaMuxer) {
+    public TestAudioListener(MediaMuxer mediaMuxer) {
         this.mediaMuxer = mediaMuxer;
     }
 
     @Override
     public void onFinish(int track) {
-
+        mediaMuxer.release();
     }
 
     @Override
@@ -37,10 +36,7 @@ public class AudioManager implements MediaAudioRecord.Listener {
 
     @Override
     public void onWriteDataToMuxer(int mTrackIndex, boolean eos, MediaCodec.BufferInfo mBufferInfo) {
-        if (eos) {
-            mediaMuxer.stop();
-            mediaMuxer.release();
-        }
+
     }
 
     @Override

@@ -1,6 +1,5 @@
 package co.astrnt.medrec.medrec.framework.opengl.v3;
 
-import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
@@ -10,6 +9,7 @@ import android.view.Surface;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import co.astrnt.medrec.medrec.R;
 import co.astrnt.medrec.medrec.framework.opengl.v3.type.ScriptedObject2D;
@@ -84,12 +84,12 @@ public class Camera extends ScriptedObject2D implements SurfaceTexture.OnFrameAv
 
     @Override
     public int getVertexSource() {
-        return R.raw.cam_v;
+        return R.raw.script_cam_v;
     }
 
     @Override
     public int getFragmentSource() {
-        return R.raw.cam_f;
+        return R.raw.script_cam_f;
     }
 
     //int[] hTex;
@@ -139,19 +139,19 @@ public class Camera extends ScriptedObject2D implements SurfaceTexture.OnFrameAv
         GLES20.glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
     }
 
-    boolean updateTexture;
+    AtomicInteger updateTexture = new AtomicInteger(0);
 
     @Override
     public void onFrameAvailable(SurfaceTexture surfaceTexture) {
-        updateTexture = true;
+        updateTexture.getAndIncrement();
         log("frame available");
     }
 
     public void updateTexture() {
         synchronized (this) {
-            if (this.updateTexture) {
+            while (this.updateTexture.get() > 0) {
                 this.mSTexture.updateTexImage();
-                updateTexture = false;
+                this.updateTexture.getAndDecrement();
             }
         }
     }
@@ -205,6 +205,8 @@ public class Camera extends ScriptedObject2D implements SurfaceTexture.OnFrameAv
     public void release() {
         super.release();
         GLES20.glDeleteTextures(1,new int[]{textureCamera},0);
-        mCamera.release();
+        if(mCamera != null){
+            mCamera.release();
+        }
     }
 }

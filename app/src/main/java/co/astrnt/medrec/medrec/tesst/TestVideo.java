@@ -19,6 +19,7 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 import co.astrnt.medrec.medrec.framework.mediacodec.record.CompressedMediaVideoRecordHandler;
+import co.astrnt.medrec.medrec.framework.mediacodec.record.MediaVideoRecord;
 import co.astrnt.medrec.medrec.framework.mediacodec.record.MediaVideoRecordHandler;
 import co.astrnt.medrec.medrec.framework.opengl.IDrawer;
 import co.astrnt.medrec.medrec.framework.opengl.v2.Drawer;
@@ -64,9 +65,9 @@ public class TestVideo extends Activity {
             }
             mDrawerDisplay = new Drawer(getResources());
             try {
-                mMediaVideoRecordHandler = CompressedMediaVideoRecordHandler.start(getResources(), mDrawerDisplay, EGL14.eglGetCurrentContext(), new MediaVideoRecordHandler.Listener() {
+                mMediaVideoRecordHandler = CompressedMediaVideoRecordHandler.start(getResources(), mDrawerDisplay, EGL14.eglGetCurrentContext(), new MediaVideoRecord.Listener() {
                     @Override
-                    public void onFinish() {
+                    public void onFinish(int track) {
 
                     }
 
@@ -94,6 +95,11 @@ public class TestVideo extends Activity {
                     @Override
                     public IDrawer getDrawerMediaCodecInitCamera(Object obj) {
                         return new Drawer(getResources(), ((int[]) obj)[2]);
+                    }
+
+                    @Override
+                    public void waitForInit() {
+
                     }
                 }, 600, 800, mediaMuxer);
             } catch (IOException e) {

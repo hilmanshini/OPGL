@@ -232,8 +232,11 @@ public class MediaAudioRecord {
             result = (prevOutputPTSUs - result) + result;
         return result;
     }
+
+
+
     public interface Listener {
-        void onFinish();
+        void onFinish(int track);
 
         boolean onGetFormatToMuxer(MediaFormat newFormat, int mTrackIndex);
 
@@ -241,5 +244,6 @@ public class MediaAudioRecord {
 
         void onWriteDataToMuxer(int mTrackIndex, boolean eos, MediaCodec.BufferInfo mBufferInfo);
 
+        void waitForInit();
     }
 }

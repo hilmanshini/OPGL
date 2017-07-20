@@ -19,12 +19,12 @@ import co.astrnt.medrec.medrec.framework.opengl.v2.Drawer;
 
 public class CompressedMediaVideoRecordHandler extends MediaVideoRecordHandler {
 
-    public CompressedMediaVideoRecordHandler(Looper looper, MediaVideoRecord mMediaVideoRecord, IDrawer mDrawer, Resources mResources, Listener mListener) {
+    public CompressedMediaVideoRecordHandler(Looper looper, MediaVideoRecord mMediaVideoRecord, IDrawer mDrawer, Resources mResources, MediaVideoRecord.Listener mListener) {
         super(looper, mMediaVideoRecord, mDrawer, mResources, mListener);
     }
 
 
-    public static CompressedMediaVideoRecordHandler start(Resources mResources, Drawer mDrawer, Listener mListener, int width, int height, MediaMuxer mediaMuxer) throws IOException {
+    public static CompressedMediaVideoRecordHandler start(Resources mResources, Drawer mDrawer, MediaVideoRecord.Listener mListener, int width, int height, MediaMuxer mediaMuxer) throws IOException {
         HandlerThread handlerThread = new HandlerThread("VCodec");
         handlerThread.start();
         MediaVideoRecord mMediaVideoRecord = new MediaVideoRecord(mResources, mListener, width, height, mediaMuxer);
@@ -32,7 +32,7 @@ public class CompressedMediaVideoRecordHandler extends MediaVideoRecordHandler {
         return self;
     }
 
-    public static CompressedMediaVideoRecordHandler start(Resources mResources, Drawer mDrawer, EGLContext eglContext, Listener mListener, int width, int height, MediaMuxer mediaMuxer) throws IOException {
+    public static CompressedMediaVideoRecordHandler start(Resources mResources, Drawer mDrawer, EGLContext eglContext, MediaVideoRecord.Listener mListener, int width, int height, MediaMuxer mediaMuxer) throws IOException {
         HandlerThread handlerThread = new HandlerThread("VCodec");
         handlerThread.start();
         MediaVideoRecord mMediaVideoRecord = new MediaVideoRecord(mResources, eglContext, mListener, width, height, mediaMuxer);
@@ -41,7 +41,7 @@ public class CompressedMediaVideoRecordHandler extends MediaVideoRecordHandler {
     }
 
     long lastValidTime = -1;
-    int frameRate = 5;
+    int frameRate = 10;
     long lastCurrentSeconds = 0;
     long lastCurrentSecondsTime = 0;
 
@@ -58,7 +58,7 @@ public class CompressedMediaVideoRecordHandler extends MediaVideoRecordHandler {
             Log.e("TIMING", "CURRENT SECONDS TIME = " + lastCurrentSeconds+" "+lastCurrentSecondsTime+" currentTime="+time+" nextTargetTime="+((oneNanos*lastCurrentSeconds)+((oneNanos/frameRate)*lastCurrentSecondsTime)));
 
         }
-
+        Log.e("TIMING", "CURRENT SECONDS TIME = " + lastCurrentSeconds+" "+lastCurrentSecondsTime+" currentTime="+time+" nextTargetTime="+((oneNanos*lastCurrentSeconds)+((oneNanos/frameRate)*lastCurrentSecondsTime)));
         return true;
     }
 }

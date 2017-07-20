@@ -1,29 +1,17 @@
 package co.astrnt.medrec.medrec.framework.mediacodec.record.manager.test;
 
 import android.app.Activity;
-import android.media.MediaCodec;
-import android.media.MediaFormat;
 import android.media.MediaMuxer;
 import android.os.Bundle;
-import android.os.SystemClock;
+import android.os.Handler;
 import android.support.annotation.Nullable;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
-import co.astrnt.medrec.medrec.R;
-import co.astrnt.medrec.medrec.framework.mediacodec.record.MediaAudioRecord;
-import co.astrnt.medrec.medrec.framework.mediacodec.record.MediaAudioRecordHandler;
-import co.astrnt.medrec.medrec.framework.mediacodec.record.MediaAudioRecordThread;
-import co.astrnt.medrec.medrec.framework.mediacodec.record.manager.AudioManager;
-import co.astrnt.medrec.medrec.framework.mediacodec.record.manager.AudioVideoRecordManager;
 import co.astrnt.medrec.medrec.framework.mediacodec.record.manager.AudioVideoRecordManager2;
+import co.astrnt.medrec.medrec.framework.mediacodec.record.manager.RecordGLView;
 
 /**
  * Created by hill on 7/18/17.
@@ -36,70 +24,50 @@ public class Test extends Activity implements View.OnClickListener {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
+        try {
+            new File("/sdcard/au.mp4").delete();
+            final MediaMuxer mediaMuxer = new MediaMuxer("/sdcard/au.mp4", MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
+            final RecordGLView mRecordGLView = new RecordGLView(this,mediaMuxer,new TestLIstener(mediaMuxer,getResources()));
+            setContentView(mRecordGLView);
+            mRecordGLView.setPaused(false);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mRecordGLView.start();
+                }
+            },2000);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mRecordGLView.stop();
+                }
+            },12000);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 //        try {
+//            new File("/sdcard/au.mp4").delete();
 //            final MediaMuxer mediaMuxer = new MediaMuxer("/sdcard/au.mp4", MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
-//            final MediaAudioRecordThread thread =
-//                    new MediaAudioRecordThread(new MediaAudioRecord.Listener() {
-//                        @Override
-//                        public void onFinish() {
+//            MediaAudioRecordThread mediaAudioRecordThread = new MediaAudioRecordThread(new TestAudioListener(mediaMuxer),mediaMuxer);
+//            mediaAudioRecordThread.start();
 //
-//                        }
+//            int i = 300;
+//            for (int i1 = 0; i1 < i; i1++) {
+//                mediaAudioRecordThread.feed();
+//            }
+//            mediaAudioRecordThread.terminate();
 //
-//                        @Override
-//                        public boolean onGetFormatToMuxer(MediaFormat newFormat, int mTrackIndex) {
-//                            mediaMuxer.start();
-//                            return false;
-//                        }
-//
-//                        @Override
-//                        public void onPrepared(MediaCodec mMediaCodec) {
-//
-//                        }
-//
-//                        @Override
-//                        public void onWriteDataToMuxer(int mTrackIndex, boolean eos, MediaCodec.BufferInfo mBufferInfo) {
-//                            if (eos) {
-//                                mediaMuxer.stop();
-//                                mediaMuxer.release();
-//                            }
-//                            Log.e("ATIME", "> " + mBufferInfo.presentationTimeUs + " " + TimeUnit.NANOSECONDS.toSeconds(mBufferInfo.presentationTimeUs * 1000000));
-//                        }
-//                    }, mediaMuxer);
-//            thread.start();
-//            SystemClock.sleep(3000);
-//            thread._stop();
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
-
-        View v = LayoutInflater.from(this).inflate(R.layout.activity_main, null);
-        ViewGroup mViewGroup = (ViewGroup) v.findViewById(R.id.container);
-        new File("/sdcard/test.mp4").delete();
-        mAudioVideoRecordManager = new AudioVideoRecordManager2(this, mViewGroup, "/sdcard/test.mp4");
-
-        mAudioVideoRecordManager.start();
-        mAudioVideoRecordManager.getmCustomGLSurfaceView().setOnClickListener(this);
-        setContentView(v);
-
-
     }
 
-    //    AudioVideoRecordManager mAudioVideoRecordManager;
-//
-//    @Override
-//    protected void onCreate(@Nullable Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        View v = LayoutInflater.from(this).inflate(R.layout.activity_main, null);
-//        ViewGroup mViewGroup = (ViewGroup) v.findViewById(R.id.container);
-//        mAudioVideoRecordManager = new AudioVideoRecordManager(this, mViewGroup, "/sdcard/test.mp4");
-//
-//        mAudioVideoRecordManager.start();
-//        mAudioVideoRecordManager.getmCustomGLSurfaceView().setOnClickListener(this);
-//        setContentView(v);
-//    }
-//
+
     @Override
     public void onClick(View v) {
         mAudioVideoRecordManager.stop();
     }
+
 }

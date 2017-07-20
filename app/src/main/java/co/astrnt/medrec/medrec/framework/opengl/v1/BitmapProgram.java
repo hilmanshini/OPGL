@@ -23,12 +23,12 @@ public class BitmapProgram extends MatrixGLProgram {
 
     @Override
     public int getVertexShaderResourceInt() {
-        return R.raw.test_bitmap_v;
+        return R.raw.script_test_bitmap_v;
     }
 
     @Override
     public int getFragmentShaderResourceInt() {
-        return R.raw.test_bitmap_f;
+        return R.raw.script_test_bitmap_f;
     }
 
     public void loadTexture() {

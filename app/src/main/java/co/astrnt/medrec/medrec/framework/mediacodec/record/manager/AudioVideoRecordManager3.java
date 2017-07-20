@@ -12,27 +12,25 @@ import java.io.File;
 import java.io.IOException;
 
 import co.astrnt.medrec.medrec.framework.mediacodec.record.MediaAudioRecord;
-import co.astrnt.medrec.medrec.framework.mediacodec.record.MediaAudioRecordHandler;
 import co.astrnt.medrec.medrec.framework.mediacodec.record.MediaAudioRecordThread;
 import co.astrnt.medrec.medrec.framework.mediacodec.record.MediaVideoRecord;
-import co.astrnt.medrec.medrec.framework.mediacodec.record.MediaVideoRecordHandler;
 import co.astrnt.medrec.medrec.framework.opengl.IDrawer;
 
 /**
  * Created by hill on 7/12/17.
  */
 
-public class AudioVideoRecordManager2 implements MediaAudioRecord.Listener, MediaVideoRecord.Listener {
+public class AudioVideoRecordManager3 implements MediaAudioRecord.Listener, MediaVideoRecord.Listener {
 
     private MediaMuxer mediaMuxer;
     private Resources mResources;
     private ViewGroup container;
-    private CustomGLSurfaceView2 mCustomGLSurfaceView;
+    private RecordGLView mCustomGLSurfaceView;
     private String outputPath;
     private Context mContext;
     private MediaAudioRecordThread mediaAudioRecordHandler;
 
-    public AudioVideoRecordManager2(Context mContext, ViewGroup container, String outputPath) {
+    public AudioVideoRecordManager3(Context mContext, ViewGroup container, String outputPath) {
         new File(outputPath).delete();
         this.mContext = mContext;
         this.container = container;
@@ -51,12 +49,12 @@ public class AudioVideoRecordManager2 implements MediaAudioRecord.Listener, Medi
         log("get audio format " + aFormat + " ");
 
 
-        mCustomGLSurfaceView = new CustomGLSurfaceView2(mContext, mediaMuxer, this);
+        mCustomGLSurfaceView = new RecordGLView(mContext, mediaMuxer, this);
 
         container.addView(mCustomGLSurfaceView);
     }
 
-    public CustomGLSurfaceView2 getmCustomGLSurfaceView() {
+    public RecordGLView getmCustomGLSurfaceView() {
         return mCustomGLSurfaceView;
     }
 
@@ -90,6 +88,7 @@ public class AudioVideoRecordManager2 implements MediaAudioRecord.Listener, Medi
             ready = true;
             return false;
         } else {
+            aTrackIndex = mTrackIndex;
             return true;
         }
 
@@ -114,11 +113,6 @@ public class AudioVideoRecordManager2 implements MediaAudioRecord.Listener, Medi
         if(mTrackIndex == vTrackIndex){
             mediaAudioRecordHandler.syncTime(mBufferInfo.presentationTimeUs, false);
         }
-
-    }
-
-    @Override
-    public void waitForInit() {
 
     }
 
@@ -151,5 +145,9 @@ public class AudioVideoRecordManager2 implements MediaAudioRecord.Listener, Medi
             mCustomGLSurfaceView.setPaused(true);
             mediaAudioRecordHandler.pause();
         }
+    }
+    @Override
+    public void waitForInit() {
+
     }
 }

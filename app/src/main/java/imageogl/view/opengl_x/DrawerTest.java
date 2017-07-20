@@ -12,7 +12,7 @@ public class DrawerTest {
     private final SimpleGlObject simpleGlObject;
 
     public DrawerTest(int width, int height, Resources resources) {
-        this.glProgram = new GLProgram(R.raw.test1_v, R.raw.test1_f, resources);
+        this.glProgram = new GLProgram(R.raw.script_test1_v, R.raw.script_test1_f, resources);
         this.glProgram.allocate("sampleVertice1", 0.0f, 1.0f, 1.0f, 0.0f, -1.0f, 0.0f);
         this.simpleGlObject = new SimpleGlObject(this.glProgram);
         this.glProgram.addObject(this.simpleGlObject);

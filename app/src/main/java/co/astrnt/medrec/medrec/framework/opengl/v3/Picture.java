@@ -1,23 +1,12 @@
 package co.astrnt.medrec.medrec.framework.opengl.v3;
 
-import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
-import android.opengl.GLUtils;
 import android.opengl.Matrix;
 import android.util.Log;
 import android.view.Surface;
 
-import java.nio.Buffer;
-import java.nio.FloatBuffer;
-import java.util.HashMap;
-import java.util.Map;
-
-import co.astrnt.medrec.medrec.BuildConfig;
 import co.astrnt.medrec.medrec.R;
-import co.astrnt.medrec.medrec.framework.opengl.v1.Utils;
 import co.astrnt.medrec.medrec.framework.opengl.v3.type.ScriptedObject2D;
 
 /**
@@ -45,11 +34,11 @@ public class Picture extends ScriptedObject2D {
     }
 
     public int getVertexSource() {
-        return R.raw.test1_v1;
+        return R.raw.script_test1_v1;
     }
 
     public int getFragmentSource() {
-        return R.raw.test1_f1;
+        return R.raw.script_test1_f1;
     }
 
     @Override

@@ -25,12 +25,12 @@ public class TextureGLProgram extends MatrixGLProgram {
 
     @Override
     public int getVertexShaderResourceInt() {
-        return R.raw.test_texture_v;
+        return R.raw.script_test_texture_v;
     }
 
     @Override
     public int getFragmentShaderResourceInt() {
-        return R.raw.test_texture_f;
+        return R.raw.script_test_texture_f;
     }
 
     public SurfaceTexture createSurfaceTexture(int w, int h) {

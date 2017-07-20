@@ -13,7 +13,6 @@ import imageogl.view.opengl_x.GLProgram;
 import imageogl.view.opengl_x.GLUtils;
 import co.astrnt.medrec.medrec.framework.opengl.v2.objects.BitmapGlObject;
 import co.astrnt.medrec.medrec.framework.opengl.v2.objects.CameraGlObject;
-import co.astrnt.medrec.medrec.framework.opengl.v2.objects.SimpleGlObject;
 
 public class Drawer implements IDrawer{
     private BitmapGlObject bitmapGlObject;
@@ -27,17 +26,17 @@ public class Drawer implements IDrawer{
 
     public Drawer(Resources resources) {
         mShortBuffer = GLUtils.allocateShort(new short[]{2, 0, 1});
-        this.glProgram = new GLProgram(R.raw.test1_v, R.raw.test1_f, resources);
+        this.glProgram = new GLProgram(R.raw.script_test1_v, R.raw.script_test1_f, resources);
         this.glProgram.allocate("sampleVertice1", 0.0f, 1.0f, 1.0f, 0.0f, -1.0f, 0.0f);
 
 //        this.simpleGlObject = new SimpleGlObject(this.glProgram);
 //        this.glProgram.addObject(this.simpleGlObject);
-        this.bitmapProgram = new GLProgram(R.raw.test1_v1, R.raw.test1_f1, resources);
+        this.bitmapProgram = new GLProgram(R.raw.script_test1_v1, R.raw.script_test1_f1, resources);
         this.bitmapProgram.allocate("positionVertex", 1.0f, 1.0f, 1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f);
         this.bitmapProgram.allocate("coordVertex", 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
         this.bitmapGlObject = new BitmapGlObject(this.bitmapProgram, resources, 17301504);
         this.bitmapProgram.addObject(this.bitmapGlObject);
-        this.cameraProgram = new GLProgram(R.raw.cam_v, R.raw.cam_f, resources);
+        this.cameraProgram = new GLProgram(R.raw.script_cam_v, R.raw.script_cam_f, resources);
         this.cameraProgram.allocate("cameraVertex", -1.0f, -1.0f, 1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 1.0f);
         this.cameraProgram.allocate("textureVertex", 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f);
         this.cameraGlObject = new CameraGlObject(this.cameraProgram);
@@ -50,16 +49,16 @@ public class Drawer implements IDrawer{
 
     public Drawer(Resources resources, int textureCamera) {
         mShortBuffer = GLUtils.allocateShort(new short[]{0, 1, 2});
-        this.glProgram = new GLProgram(R.raw.test1_v, R.raw.test1_f, resources);
+        this.glProgram = new GLProgram(R.raw.script_test1_v, R.raw.script_test1_f, resources);
         this.glProgram.allocate("sampleVertice1", 0.0f, 1.0f, 1.0f, 0.0f, -1.0f, 0.0f);
 //        this.simpleGlObject = new SimpleGlObject(this.glProgram);
 //        this.glProgram.addObject(this.simpleGlObject);
-        this.bitmapProgram = new GLProgram(R.raw.test1_v1, R.raw.test1_f1, resources);
+        this.bitmapProgram = new GLProgram(R.raw.script_test1_v1, R.raw.script_test1_f1, resources);
         this.bitmapProgram.allocate("positionVertex", 1.0f, 1.0f, 1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f);
         this.bitmapProgram.allocate("coordVertex", 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
         this.bitmapGlObject = new BitmapGlObject(this.bitmapProgram, resources, 17301504);
         this.bitmapProgram.addObject(this.bitmapGlObject);
-        this.cameraProgram = new GLProgram(R.raw.cam_v, R.raw.cam_f, resources);
+        this.cameraProgram = new GLProgram(R.raw.script_cam_v, R.raw.script_cam_f, resources);
         this.cameraProgram.allocate("cameraVertex", -1.0f, 1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 1.0f, -1.0f);
 
         this.cameraProgram.allocate("textureVertex", 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f);

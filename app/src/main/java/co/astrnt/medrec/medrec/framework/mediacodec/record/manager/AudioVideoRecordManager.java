@@ -13,6 +13,7 @@ import java.io.IOException;
 
 import co.astrnt.medrec.medrec.framework.mediacodec.record.MediaAudioRecord;
 import co.astrnt.medrec.medrec.framework.mediacodec.record.MediaAudioRecordHandler;
+import co.astrnt.medrec.medrec.framework.mediacodec.record.MediaVideoRecord;
 import co.astrnt.medrec.medrec.framework.mediacodec.record.MediaVideoRecordHandler;
 import co.astrnt.medrec.medrec.framework.opengl.IDrawer;
 
@@ -20,7 +21,7 @@ import co.astrnt.medrec.medrec.framework.opengl.IDrawer;
  * Created by hill on 7/12/17.
  */
 
-public class AudioVideoRecordManager implements MediaAudioRecord.Listener, MediaVideoRecordHandler.Listener {
+public class AudioVideoRecordManager implements MediaAudioRecord.Listener, MediaVideoRecord.Listener {
 
     private MediaMuxer mediaMuxer;
     private Resources mResources;
@@ -69,7 +70,7 @@ public class AudioVideoRecordManager implements MediaAudioRecord.Listener, Media
 
 
     @Override
-    public void onFinish() {
+    public void onFinish(int track) {
 
     }
 
@@ -111,6 +112,11 @@ public class AudioVideoRecordManager implements MediaAudioRecord.Listener, Media
             return;
         }
         mediaAudioRecordHandler.capture(mBufferInfo.presentationTimeUs, eos);
+
+    }
+
+    @Override
+    public void waitForInit() {
 
     }
 
