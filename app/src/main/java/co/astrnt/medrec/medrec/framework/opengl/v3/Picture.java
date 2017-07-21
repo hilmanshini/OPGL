@@ -46,10 +46,12 @@ public class Picture extends ScriptedObject2D {
         beginDraw();
         Matrix.setIdentityM(mMVPMatrix, 0);
         fillMatrix("uMVP", mMVPMatrix);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,textureActiveId);
         enableVertices("positionVertex", "aPosition");
         enableVertices("coordVertex", "aTexCoord");
         GLES20.glDrawElements(GLES20.GL_TRIANGLE_STRIP, 6, GLES20.GL_UNSIGNED_SHORT, getBuffer("order"));
 //        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,0);
         enableAlphaChannel();
         endDraw();
     }

@@ -160,6 +160,7 @@ public abstract class ScriptedObject2D extends BufferedObject2D {
     public Resources getResources() {
         return mResources;
     }
+
     public void beginDraw(){
         log("enabling program "+programPointer);
 
@@ -167,7 +168,7 @@ public abstract class ScriptedObject2D extends BufferedObject2D {
     }
 
     private void log(String s) {
-        Log.e("HILGL_ScrObj2D","> "+s);
+        Log.e(getClass().getName()+"HILGL_ScrObj2D","> "+s);
     }
 
     public void endDraw()
@@ -176,6 +177,12 @@ public abstract class ScriptedObject2D extends BufferedObject2D {
         GLES20.glUseProgram(0);
     }
     public void fillUniform(String var, float val) {
+        log("fill uniform1 for "+var+" #"+GLES20.glGetUniformLocation(this.programPointer, var));
         GLES20.glUniform1f(GLES20.glGetUniformLocation(this.programPointer, var), val);
+    }
+    public void fillUniform4(String var, float... val) {
+        log("fill uniform4 for "+var+" #"+GLES20.glGetUniformLocation(this.programPointer, var));
+
+        GLES20.glUniform4f(GLES20.glGetUniformLocation(this.programPointer, var), val[0],val[1],val[2],val[3]);
     }
 }
